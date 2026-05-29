@@ -569,7 +569,6 @@
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
-
 <script>
 // ══════════════════════════════════════════════
 // CONFIGURACIÓN SUPABASE
@@ -577,21 +576,18 @@
 const SUPABASE_URL = 'https://qxwbostokfnwhiqnmyav.supabase.co';
 const SUPABASE_KEY = 'sb_publishable_mVJ_RwtBim_42tV3-jJ28g_YOiouH2i';
 
+// Usamos fetch directo para todas las operaciones (evita DataCloneError del SDK)
+const API = `${SUPABASE_URL}/rest/v1/tareas`;
+const HEADERS = {
+  'Content-Type': 'application/json',
+  'apikey': SUPABASE_KEY,
+  'Authorization': `Bearer ${SUPABASE_KEY}`
+};
+
+// Cliente Supabase SOLO para realtime
 const { createClient } = supabase;
-const db = createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: { persistSession: false },
-  realtime: { params: { eventsPerSecond: 10 } },
-  global: {
-    fetch: (url, options = {}) => {
-      // Elimina el objeto Headers nativo para evitar DataCloneError en postMessage
-      if (options.headers && options.headers instanceof Headers) {
-        const plain = {};
-        options.headers.forEach((v, k) => { plain[k] = v; });
-        options = { ...options, headers: plain };
-      }
-      return fetch(url, options);
-    }
-  }
+const dbRealtime = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: { persistSession: false }
 });
 
 // ══════════════════════════════════════════════
@@ -620,13 +616,19 @@ function updateDate() {
 }
 
 // ══════════════════════════════════════════════
-// SUPABASE CRUD
+// FETCH DIRECTO (sin SDK para evitar DataCloneError)
 // ══════════════════════════════════════════════
 async function loadTasks() {
-  const { data, error } = await db.from('tareas').select('*').order('fecha_creacion', { ascending: false });
-  if (error) { showToast('Error al cargar tareas', 'error'); return; }
-  allTasks = data || [];
-  renderAll();
+  try {
+    const res = await fetch(`${API}?order=fecha_creacion.desc`, {
+      headers: { ...HEADERS, 'Accept': 'application/json' }
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    allTasks = await res.json();
+    renderAll();
+  } catch (err) {
+    showToast('Error al cargar tareas: ' + err.message, 'error');
+  }
 }
 
 async function agregarTarea() {
@@ -651,17 +653,29 @@ async function agregarTarea() {
     año: now.getFullYear()
   };
 
-  const { error } = await db.from('tareas').insert([nuevaTarea]);
+  try {
+    const res = await fetch(API, {
+      method: 'POST',
+      headers: { ...HEADERS, 'Prefer': 'return=representation' },
+      body: JSON.stringify(nuevaTarea)
+    });
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      throw new Error(e.message || `HTTP ${res.status}`);
+    }
+    const [inserted] = await res.json();
+    allTasks.unshift(inserted);
+    renderAll();
+    document.getElementById('solicitante').value = '';
+    document.getElementById('descripcion').value = '';
+    resetAssignee();
+    showToast('✓ Tarea agregada correctamente', 'success');
+  } catch (err) {
+    showToast('Error al guardar: ' + err.message, 'error');
+  }
 
   btn.disabled = false;
   btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Agregar tarea';
-
-  if (error) { showToast('Error al guardar: ' + error.message, 'error'); return; }
-
-  document.getElementById('solicitante').value = '';
-  document.getElementById('descripcion').value = '';
-  resetAssignee();
-  showToast('✓ Tarea agregada correctamente', 'success');
 }
 
 async function toggleTask(id, currentStatus) {
@@ -670,31 +684,46 @@ async function toggleTask(id, currentStatus) {
     estado: newStatus,
     fecha_completada: newStatus === 'completada' ? new Date().toISOString() : null
   };
-  const { error } = await db.from('tareas').update(updates).eq('id', id);
-  if (error) { showToast('Error al actualizar', 'error'); return; }
-
-  const idx = allTasks.findIndex(t => t.id === id);
-  if (idx !== -1) { allTasks[idx].estado = newStatus; allTasks[idx].fecha_completada = updates.fecha_completada; }
-  renderAll();
+  try {
+    const res = await fetch(`${API}?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: { ...HEADERS, 'Prefer': 'return=minimal' },
+      body: JSON.stringify(updates)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const idx = allTasks.findIndex(t => t.id === id);
+    if (idx !== -1) { allTasks[idx].estado = newStatus; allTasks[idx].fecha_completada = updates.fecha_completada; }
+    renderAll();
+  } catch (err) {
+    showToast('Error al actualizar: ' + err.message, 'error');
+  }
 }
 
 // ══════════════════════════════════════════════
-// REALTIME
+// REALTIME (solo para sincronización entre usuarios)
 // ══════════════════════════════════════════════
 function subscribeRealtime() {
-  db.channel('tareas-channel')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'tareas' }, payload => {
-      if (payload.eventType === 'INSERT') {
-        allTasks.unshift(payload.new);
-      } else if (payload.eventType === 'UPDATE') {
-        const idx = allTasks.findIndex(t => t.id === payload.new.id);
-        if (idx !== -1) allTasks[idx] = payload.new;
-      } else if (payload.eventType === 'DELETE') {
-        allTasks = allTasks.filter(t => t.id !== payload.old.id);
-      }
-      renderAll();
-    })
-    .subscribe();
+  try {
+    dbRealtime.channel('tareas-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tareas' }, payload => {
+        try {
+          if (payload.eventType === 'INSERT') {
+            // Solo agregar si no está ya (puede venir del insert propio)
+            if (!allTasks.find(t => t.id === payload.new.id)) {
+              allTasks.unshift(payload.new);
+              renderAll();
+            }
+          } else if (payload.eventType === 'UPDATE') {
+            const idx = allTasks.findIndex(t => t.id === payload.new.id);
+            if (idx !== -1) { allTasks[idx] = payload.new; renderAll(); }
+          } else if (payload.eventType === 'DELETE') {
+            allTasks = allTasks.filter(t => t.id !== payload.old.id);
+            renderAll();
+          }
+        } catch(e) { /* ignorar errores de payload */ }
+      })
+      .subscribe();
+  } catch(e) { /* realtime opcional, no bloquea la app */ }
 }
 
 // ══════════════════════════════════════════════
@@ -723,8 +752,6 @@ function renderUserPanels() {
       container.innerHTML = `<div class="empty-state"><div class="empty-icon">◎</div>Sin tareas asignadas</div>`;
       return;
     }
-
-    // Pendientes primero, luego completadas
     const sorted = [...pending, ...done];
     container.innerHTML = sorted.map(task => `
       <div class="task-item ${task.estado === 'completada' ? 'completed' : ''}"
@@ -747,8 +774,6 @@ function renderUserPanels() {
 function buildMonthTabs() {
   const monthSet = new Set();
   allTasks.forEach(t => monthSet.add(`${t.mes} ${t.año}`));
-
-  // Añadir el mes actual siempre
   const now = new Date();
   const currentMonthLabel = `${MESES[now.getMonth()]} ${now.getFullYear()}`;
   monthSet.add(currentMonthLabel);
