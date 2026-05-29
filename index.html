@@ -13,6 +13,7 @@
   --accent:#7c6dfa;--accent2:#9d91fb;--accent-glow:rgba(124,109,250,.15);
   --green:#4ade80;--green-bg:rgba(74,222,128,.08);
   --amber:#fbbf24;--amber-bg:rgba(251,191,36,.08);
+  --red:#f87171;--red-bg:rgba(248,113,113,.08);
   --alex:#60a5fa;--alex-bg:rgba(96,165,250,.08);
   --danner:#f472b6;--danner-bg:rgba(244,114,182,.08);
   --ambos:#a78bfa;--ambos-bg:rgba(167,139,250,.08);
@@ -65,12 +66,12 @@ textarea{resize:vertical;min-height:80px}
 .pfill{height:100%;border-radius:2px;transition:width .4s ease}
 .pfill.ax{background:var(--alex)}.pfill.dn{background:var(--danner)}.pfill.ab{background:var(--ambos)}
 .tlist{display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto}
-.ti{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;display:flex;align-items:flex-start;gap:10px;cursor:pointer;transition:all .2s}
+.ti{background:var(--bg3);border:1px solid var(--border);border-radius:var(--rs);padding:10px 12px;display:flex;align-items:flex-start;gap:10px;transition:all .2s}
 .ti:hover{border-color:var(--border2);background:var(--bg4)}
 .ti.done{opacity:.5}.ti.done .tdesc{text-decoration:line-through;color:var(--text3)}
-.cc{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:10px;color:transparent}
+.cc{width:18px;height:18px;border-radius:50%;border:1.5px solid var(--border2);flex-shrink:0;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all .2s;font-size:10px;color:transparent;cursor:pointer}
 .ti.done .cc{border-color:var(--green);background:var(--green);color:#fff}
-.tc{flex:1;min-width:0}.tdesc{font-size:13px;color:var(--text)}.tmeta{font-size:11px;color:var(--text3);margin-top:2px}
+.tc{flex:1;min-width:0;cursor:pointer}.tdesc{font-size:13px;color:var(--text)}.tmeta{font-size:11px;color:var(--text3);margin-top:2px}
 .empty{text-align:center;padding:32px 16px;color:var(--text3);font-size:12px}
 .dbc{display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap}
 .mtabs{display:flex;gap:6px;flex-wrap:wrap;flex:1}
@@ -99,6 +100,45 @@ tbody tr:hover{background:var(--bg3)}
 @keyframes rot{to{transform:rotate(360deg)}}
 @media(max-width:900px){.pgrid{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}.fg.full{grid-column:1}main{padding:20px 16px}header{padding:0 16px}}
 @media(max-width:600px){.agrid{grid-template-columns:1fr}}
+
+/* ── NUEVOS ESTILOS: botones de acción en tarjeta ── */
+.ti-actions{display:flex;align-items:center;gap:4px;flex-shrink:0;opacity:0;transition:opacity .2s}
+.ti:hover .ti-actions{opacity:1}
+.tia{width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--text3);transition:all .15s}
+.tia:hover.edit{border-color:var(--accent);color:var(--accent);background:var(--accent-glow)}
+.tia:hover.del{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+
+/* ── MODAL ── */
+#modal-overlay{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+#modal-overlay.open{opacity:1;pointer-events:all}
+#modal-box{background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:28px;width:100%;max-width:480px;transform:translateY(16px) scale(.97);transition:transform .25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 24px 64px rgba(0,0,0,.6)}
+#modal-overlay.open #modal-box{transform:translateY(0) scale(1)}
+.modal-title{font-size:15px;font-weight:600;margin-bottom:20px;color:var(--text);display:flex;align-items:center;gap:8px}
+.modal-title span{font-size:18px}
+.mfg{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
+.mfg label{font-size:11px;font-weight:500;color:var(--text2);letter-spacing:.5px;text-transform:uppercase}
+.modal-footer{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.mbtn{border-radius:var(--rs);padding:9px 20px;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;border:1px solid var(--border)}
+.mbtn.cancel{background:var(--bg3);color:var(--text2)}.mbtn.cancel:hover{border-color:var(--border2);color:var(--text)}
+.mbtn.save{background:var(--accent);color:#fff;border-color:var(--accent)}.mbtn.save:hover{background:var(--accent2)}
+.mbtn.save:disabled{opacity:.5;cursor:not-allowed}
+.mbtn.danger{background:var(--red-bg);color:var(--red);border-color:rgba(248,113,113,.3)}.mbtn.danger:hover{background:rgba(248,113,113,.18)}
+
+/* ── Botón limpiar panel ── */
+.ph{justify-content:space-between}
+.ph-left{display:flex;align-items:center;gap:10px}
+.bclear{background:transparent;border:1px solid var(--border);color:var(--text3);font-family:'DM Sans',sans-serif;font-size:11px;padding:4px 10px;border-radius:20px;cursor:pointer;transition:all .2s}
+.bclear:hover{border-color:var(--red);color:var(--red);background:var(--red-bg)}
+
+/* ── Confirm modal ── */
+#confirm-overlay{position:fixed;inset:0;z-index:600;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+#confirm-overlay.open{opacity:1;pointer-events:all}
+#confirm-box{background:var(--bg2);border:1px solid rgba(248,113,113,.3);border-radius:var(--r);padding:28px;width:100%;max-width:360px;transform:scale(.95);transition:transform .2s cubic-bezier(.34,1.56,.64,1);box-shadow:0 24px 64px rgba(0,0,0,.6);text-align:center}
+#confirm-overlay.open #confirm-box{transform:scale(1)}
+.conf-icon{font-size:32px;margin-bottom:12px}
+.conf-title{font-size:15px;font-weight:600;margin-bottom:8px}
+.conf-msg{font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.5}
+.conf-footer{display:flex;gap:10px;justify-content:center}
 </style>
 </head>
 <body>
@@ -148,7 +188,10 @@ tbody tr:hover{background:var(--bg3)}
     <div class="slabel">02 &mdash; Panel de tareas</div>
     <div class="pgrid">
       <div class="card">
-        <div class="ph"><div class="av ax">AL</div><span class="un ax">Alexander</span></div>
+        <div class="ph">
+          <div class="ph-left"><div class="av ax">AL</div><span class="un ax">Alexander</span></div>
+          <button class="bclear" onclick="confirmClearUser('Alexander')">Limpiar todo</button>
+        </div>
         <div class="srow">
           <div class="sb"><div class="sn p" id="ax-p">0</div><div class="sl">Pendientes</div></div>
           <div class="sb"><div class="sn d" id="ax-d">0</div><div class="sl">Completadas</div></div>
@@ -157,7 +200,10 @@ tbody tr:hover{background:var(--bg3)}
         <div class="tlist" id="ax-list"><div class="empty">Sin tareas asignadas</div></div>
       </div>
       <div class="card">
-        <div class="ph"><div class="av dn">DA</div><span class="un dn">Danner</span></div>
+        <div class="ph">
+          <div class="ph-left"><div class="av dn">DA</div><span class="un dn">Danner</span></div>
+          <button class="bclear" onclick="confirmClearUser('Danner')">Limpiar todo</button>
+        </div>
         <div class="srow">
           <div class="sb"><div class="sn p" id="dn-p">0</div><div class="sl">Pendientes</div></div>
           <div class="sb"><div class="sn d" id="dn-d">0</div><div class="sl">Completadas</div></div>
@@ -166,7 +212,10 @@ tbody tr:hover{background:var(--bg3)}
         <div class="tlist" id="dn-list"><div class="empty">Sin tareas asignadas</div></div>
       </div>
       <div class="card">
-        <div class="ph"><div class="av ab">&#8596;</div><span class="un ab">Ambos</span></div>
+        <div class="ph">
+          <div class="ph-left"><div class="av ab">&#8596;</div><span class="un ab">Ambos</span></div>
+          <button class="bclear" onclick="confirmClearUser('Ambos')">Limpiar todo</button>
+        </div>
         <div class="srow">
           <div class="sb"><div class="sn p" id="ab-p">0</div><div class="sl">Pendientes</div></div>
           <div class="sb"><div class="sn d" id="ab-d">0</div><div class="sl">Completadas</div></div>
@@ -188,7 +237,7 @@ tbody tr:hover{background:var(--bg3)}
         <table>
           <thead><tr>
             <th>#</th><th>Tarea</th><th>Solicitante</th>
-            <th>Asignado a</th><th>Estado</th><th>Creaci&oacute;n</th><th>Completada</th>
+            <th>Asignado a</th><th>Estado</th><th>Creaci&oacute;n</th><th>Completada</th><th>Acciones</th>
           </tr></thead>
           <tbody id="tbody"></tbody>
         </table>
@@ -197,6 +246,52 @@ tbody tr:hover{background:var(--bg3)}
   </div>
 
 </main>
+
+<!-- MODAL EDICIÓN -->
+<div id="modal-overlay" onclick="closeModal(event)">
+  <div id="modal-box">
+    <div class="modal-title"><span>✏️</span> Editar tarea</div>
+    <div class="mfg">
+      <label>Solicitante</label>
+      <input type="text" id="edit-sol" placeholder="Nombre del solicitante...">
+    </div>
+    <div class="mfg">
+      <label>Descripción</label>
+      <textarea id="edit-desc" style="min-height:90px" placeholder="Descripción de la tarea..."></textarea>
+    </div>
+    <div class="mfg">
+      <label>Asignar a</label>
+      <div class="agrid">
+        <button class="abtn ax" data-val="Alexander" onclick="pickEditUser(this)">
+          <div class="av ax">AL</div><span class="nm">Alexander</span>
+        </button>
+        <button class="abtn dn" data-val="Danner" onclick="pickEditUser(this)">
+          <div class="av dn">DA</div><span class="nm">Danner</span>
+        </button>
+        <button class="abtn ab" data-val="Ambos" onclick="pickEditUser(this)">
+          <div class="av ab">&#8596;</div><span class="nm">Ambos</span>
+        </button>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="mbtn cancel" onclick="closeModal()">Cancelar</button>
+      <button class="mbtn save" id="btn-save-edit" onclick="saveEdit()">Guardar cambios</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMACIÓN -->
+<div id="confirm-overlay">
+  <div id="confirm-box">
+    <div class="conf-icon" id="conf-icon">🗑️</div>
+    <div class="conf-title" id="conf-title">¿Eliminar tarea?</div>
+    <div class="conf-msg" id="conf-msg">Esta acción no se puede deshacer.</div>
+    <div class="conf-footer">
+      <button class="mbtn cancel" onclick="closeConfirm()">Cancelar</button>
+      <button class="mbtn danger" id="conf-ok-btn" onclick="confirmOk()">Eliminar</button>
+    </div>
+  </div>
+</div>
 
 <div id="toast"></div>
 
@@ -280,10 +375,6 @@ function getTasks() {
 
 /* -------------------------------------------------------
    AGREGAR TAREA
-   FIX 1: .finally re-busca el boton con getElementById
-          para evitar referencia a nodo desconectado del DOM.
-   FIX 2: renderPanels usa &quot; en onclick en lugar de
-          comillas mezcladas que rompian el HTML.
 ------------------------------------------------------- */
 function addTask() {
   var sol  = (document.getElementById('inp-sol').value  || '').trim();
@@ -327,8 +418,6 @@ function addTask() {
     toast('No se pudo guardar: ' + e.message, 'err');
   })
   .finally(function(){
-    /* FIX: volvemos a buscar el elemento; tras render() la
-       referencia anterior puede apuntar a un nodo desconectado */
     var b = document.getElementById('btn-add');
     if (b) { b.disabled = false; b.textContent = '+ Agregar tarea'; }
   });
@@ -395,19 +484,22 @@ function renderPanels() {
     }
 
     var html = '';
-    /* FIX: usamos &quot; para las comillas del onclick en lugar de
-       mezclar comillas simples/dobles que generaban HTML invalido */
     pend.concat(done).forEach(function(t) {
       var cls      = t.estado==='completada' ? 'ti done' : 'ti';
       var chk      = t.estado==='completada' ? '&#10003;' : '';
       var safeId   = String(t.id).replace(/"/g,'');
       var safeEst  = String(t.estado).replace(/"/g,'');
-      html += '<div class="' + cls + '" onclick="toggle(&quot;' + safeId + '&quot;,&quot;' + safeEst + '&quot;)">'
-            + '<div class="cc">' + chk + '</div>'
-            + '<div class="tc">'
+      html += '<div class="' + cls + '">'
+            + '<div class="cc" onclick="toggle(&quot;' + safeId + '&quot;,&quot;' + safeEst + '&quot;)">' + chk + '</div>'
+            + '<div class="tc" onclick="toggle(&quot;' + safeId + '&quot;,&quot;' + safeEst + '&quot;)">'
             + '<div class="tdesc">' + esc(t.descripcion) + '</div>'
             + '<div class="tmeta">Solicitado por: ' + esc(t.solicitante) + ' &middot; ' + esc(t.mes) + ' ' + esc(String(t.año)) + '</div>'
-            + '</div></div>';
+            + '</div>'
+            + '<div class="ti-actions">'
+            + '<button class="tia edit" title="Editar" onclick="openEditModal(&quot;' + safeId + '&quot;)">✏️</button>'
+            + '<button class="tia del" title="Eliminar" onclick="confirmDelete(&quot;' + safeId + '&quot;)">🗑</button>'
+            + '</div>'
+            + '</div>';
     });
     el.innerHTML = html;
   });
@@ -436,14 +528,14 @@ function renderTable() {
   var el = document.getElementById('tbody');
   if (!el) return;
   if (!selMonth) {
-    el.innerHTML = '<tr><td colspan="7"><div class="nodata">Selecciona un mes</div></td></tr>';
+    el.innerHTML = '<tr><td colspan="8"><div class="nodata">Selecciona un mes</div></td></tr>';
     return;
   }
   var parts = selMonth.split(' ');
   var mes = parts[0], anio = parseInt(parts[1],10);
   var rows = tasks.filter(function(t){ return t.mes===mes && t.año===anio; });
   if (!rows.length) {
-    el.innerHTML = '<tr><td colspan="7"><div class="nodata">Sin tareas este mes</div></td></tr>';
+    el.innerHTML = '<tr><td colspan="8"><div class="nodata">Sin tareas este mes</div></td></tr>';
     return;
   }
   var html = '';
@@ -452,6 +544,7 @@ function renderTable() {
     var fcp = t.fecha_completada ? fmtDate(t.fecha_completada) : '&mdash;';
     var uk  = t.asignado_a ? t.asignado_a.toLowerCase() : '';
     var est = t.estado==='completada' ? '&#10003; Completada' : '&#9675; Pendiente';
+    var sid = String(t.id).replace(/"/g,'');
     html += '<tr>'
       + '<td style="font-family:\'DM Mono\',monospace;color:var(--text3);font-size:12px">'+pad(i+1)+'</td>'
       + '<td style="color:var(--text);max-width:260px">'+esc(t.descripcion)+'</td>'
@@ -460,6 +553,12 @@ function renderTable() {
       + '<td><span class="badge '+esc(t.estado)+'">'+est+'</span></td>'
       + '<td style="font-family:\'DM Mono\',monospace;font-size:12px">'+fc+'</td>'
       + '<td style="font-family:\'DM Mono\',monospace;font-size:12px">'+fcp+'</td>'
+      + '<td>'
+      +   '<div style="display:flex;gap:6px">'
+      +     '<button class="tia edit" style="opacity:1;width:28px;height:28px" title="Editar" onclick="openEditModal(&quot;'+sid+'&quot;)">✏️</button>'
+      +     '<button class="tia del"  style="opacity:1;width:28px;height:28px" title="Eliminar" onclick="confirmDelete(&quot;'+sid+'&quot;)">🗑</button>'
+      +   '</div>'
+      + '</td>'
       + '</tr>';
   });
   el.innerHTML = html;
@@ -495,7 +594,7 @@ function download() {
 }
 
 /* -------------------------------------------------------
-   HELPERS UI
+   HELPERS UI (originales)
 ------------------------------------------------------- */
 function pickUser(btn) {
   document.querySelectorAll('.abtn').forEach(function(b){b.classList.remove('on');});
@@ -546,6 +645,171 @@ function toDate(label) {
   var p = label.split(' ');
   return new Date(p[1]+'-'+String(MESES.indexOf(p[0])+1).padStart(2,'0')+'-01');
 }
+
+/* =======================================================
+   NUEVAS FUNCIONES — EDITAR, ELIMINAR, LIMPIAR
+   (no modifican nada del código original arriba)
+======================================================= */
+
+/* ── Estado del modal de edición ── */
+var editId      = null;
+var editSelUser = null;
+
+function openEditModal(id) {
+  var t = tasks.find(function(x){ return String(x.id) === String(id); });
+  if (!t) { toast('Tarea no encontrada', 'err'); return; }
+
+  editId = id;
+  editSelUser = t.asignado_a;
+
+  document.getElementById('edit-sol').value  = t.solicitante  || '';
+  document.getElementById('edit-desc').value = t.descripcion || '';
+
+  /* marcar usuario actual en el modal */
+  document.querySelectorAll('#modal-box .abtn').forEach(function(b){
+    b.classList.remove('on');
+    if (b.getAttribute('data-val') === t.asignado_a) b.classList.add('on');
+  });
+
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function pickEditUser(btn) {
+  document.querySelectorAll('#modal-box .abtn').forEach(function(b){ b.classList.remove('on'); });
+  btn.classList.add('on');
+  editSelUser = btn.getAttribute('data-val');
+}
+
+function closeModal(evt) {
+  if (evt && evt.target !== document.getElementById('modal-overlay')) return;
+  document.getElementById('modal-overlay').classList.remove('open');
+  editId = null;
+}
+
+function saveEdit() {
+  var sol  = (document.getElementById('edit-sol').value  || '').trim();
+  var desc = (document.getElementById('edit-desc').value || '').trim();
+
+  if (!sol)         { toast('Ingresa el nombre del solicitante', 'err'); return; }
+  if (!desc)        { toast('Ingresa la descripción', 'err'); return; }
+  if (!editSelUser) { toast('Selecciona a quién va dirigida', 'err'); return; }
+
+  var btn = document.getElementById('btn-save-edit');
+  if (btn) { btn.disabled = true; btn.textContent = 'Guardando...'; }
+
+  var body = JSON.stringify({
+    solicitante : sol,
+    descripcion : desc,
+    asignado_a  : editSelUser
+  });
+
+  fetch(API + '?id=eq.' + editId, {
+    method  : 'PATCH',
+    headers : Object.assign({}, H, {'Prefer':'return=representation'}),
+    body    : body
+  })
+  .then(function(r){
+    if (!r.ok) return r.text().then(function(t){ throw new Error(t || 'HTTP '+r.status); });
+    return r.json();
+  })
+  .then(function(data){
+    var updated = Array.isArray(data) ? data[0] : data;
+    if (updated && updated.id) {
+      var i = tasks.findIndex(function(x){ return String(x.id) === String(updated.id); });
+      if (i > -1) tasks[i] = updated;
+    } else {
+      /* fallback local si la API no devuelve el registro */
+      var i2 = tasks.findIndex(function(x){ return String(x.id) === String(editId); });
+      if (i2 > -1) {
+        tasks[i2].solicitante = sol;
+        tasks[i2].descripcion = desc;
+        tasks[i2].asignado_a  = editSelUser;
+      }
+    }
+    render();
+    document.getElementById('modal-overlay').classList.remove('open');
+    editId = null;
+    toast('Tarea actualizada correctamente', 'ok');
+  })
+  .catch(function(e){ toast('Error al guardar: ' + e.message, 'err'); })
+  .finally(function(){
+    var b = document.getElementById('btn-save-edit');
+    if (b) { b.disabled = false; b.textContent = 'Guardar cambios'; }
+  });
+}
+
+/* ── Eliminar una tarea ── */
+var confirmAction = null; /* función a ejecutar al confirmar */
+
+function confirmDelete(id) {
+  document.getElementById('conf-icon').textContent  = '🗑️';
+  document.getElementById('conf-title').textContent = '¿Eliminar tarea?';
+  document.getElementById('conf-msg').textContent   = 'Esta acción no se puede deshacer.';
+  document.getElementById('conf-ok-btn').textContent = 'Eliminar';
+  confirmAction = function(){ deleteTask(id); };
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+
+function deleteTask(id) {
+  fetch(API + '?id=eq.' + id, {
+    method  : 'DELETE',
+    headers : Object.assign({}, H, {'Prefer':'return=minimal'})
+  })
+  .then(function(r){
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    tasks = tasks.filter(function(t){ return String(t.id) !== String(id); });
+    render();
+    toast('Tarea eliminada', 'ok');
+  })
+  .catch(function(e){ toast('Error al eliminar: ' + e.message, 'err'); });
+}
+
+/* ── Limpiar todas las tareas de un usuario ── */
+function confirmClearUser(user) {
+  var count = tasks.filter(function(t){ return t.asignado_a === user; }).length;
+  if (!count) { toast('No hay tareas para eliminar', 'err'); return; }
+  document.getElementById('conf-icon').textContent  = '⚠️';
+  document.getElementById('conf-title').textContent = 'Limpiar tareas de ' + user;
+  document.getElementById('conf-msg').textContent   = 'Se eliminarán ' + count + ' tarea(s). Esta acción no se puede deshacer.';
+  document.getElementById('conf-ok-btn').textContent = 'Eliminar todas';
+  confirmAction = function(){ clearUserTasks(user); };
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+
+function clearUserTasks(user) {
+  var ids = tasks.filter(function(t){ return t.asignado_a === user; }).map(function(t){ return t.id; });
+  if (!ids.length) return;
+
+  /* Supabase REST: DELETE con filtro in */
+  fetch(API + '?asignado_a=eq.' + encodeURIComponent(user), {
+    method  : 'DELETE',
+    headers : Object.assign({}, H, {'Prefer':'return=minimal'})
+  })
+  .then(function(r){
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    tasks = tasks.filter(function(t){ return t.asignado_a !== user; });
+    render();
+    toast('Tareas de ' + user + ' eliminadas', 'ok');
+  })
+  .catch(function(e){ toast('Error al limpiar: ' + e.message, 'err'); });
+}
+
+/* ── Helpers del modal de confirmación ── */
+function closeConfirm() {
+  document.getElementById('confirm-overlay').classList.remove('open');
+  confirmAction = null;
+}
+
+function confirmOk() {
+  document.getElementById('confirm-overlay').classList.remove('open');
+  if (typeof confirmAction === 'function') confirmAction();
+  confirmAction = null;
+}
+
+/* cerrar confirm al click fuera */
+document.getElementById('confirm-overlay').addEventListener('click', function(e){
+  if (e.target === this) closeConfirm();
+});
 </script>
 </body>
 </html>
