@@ -651,151 +651,121 @@ function download() {
 
   var { jsPDF } = window.jspdf;
   var doc = new jsPDF({ orientation:'landscape', unit:'mm', format:'a4' });
-
   var W = doc.internal.pageSize.getWidth();
   var H = doc.internal.pageSize.getHeight();
 
-  /* ── Fondo negro ── */
-  doc.setFillColor(0, 4, 0);
-  doc.rect(0, 0, W, H, 'F');
-
-  /* ── Líneas de lluvia decorativas ── */
-  doc.setDrawColor(0, 40, 0);
-  doc.setLineWidth(0.1);
-  for (var lx = 0; lx < W; lx += 8) {
-    doc.line(lx, 0, lx, H);
-  }
-
-  /* ── Borde exterior ── */
-  doc.setDrawColor(0, 180, 50);
-  doc.setLineWidth(0.4);
-  doc.rect(6, 6, W-12, H-12);
-
-  /* ── Header banner ── */
-  doc.setFillColor(0, 15, 0);
-  doc.rect(6, 6, W-12, 22, 'F');
-  doc.setDrawColor(0, 180, 50);
-  doc.setLineWidth(0.3);
-  doc.line(6, 28, W-6, 28);
-
-  /* ── Título ── */
-  doc.setTextColor(0, 255, 65);
-  doc.setFontSize(16);
-  doc.setFont('courier', 'bold');
-  doc.text('[ MKT_TASKS // REGISTRO_MENSUAL ]', W/2, 16, {align:'center'});
-
-  doc.setFontSize(9);
-  doc.setFont('courier', 'normal');
-  doc.setTextColor(0, 150, 40);
-  doc.text('PERIODO: ' + mes.toUpperCase() + ' ' + anio, 14, 24);
-  doc.text('GENERADO: ' + new Date().toLocaleDateString('es-MX'), W-14, 24, {align:'right'});
-  doc.text('TOTAL_REGISTROS: ' + rows.length, W/2, 24, {align:'center'});
-
-  /* ── Stats row ── */
-  var total    = rows.length;
+  var total       = rows.length;
   var completadas = rows.filter(function(t){ return t.estado==='completada'; }).length;
   var pendientes  = rows.filter(function(t){ return t.estado==='pendiente'; }).length;
 
-  var statY = 34;
-  var boxes = [
-    { label:'TOTAL', val: total,       color:[0,255,65] },
-    { label:'COMPLETADAS', val: completadas, color:[0,220,55] },
-    { label:'PENDIENTES', val: pendientes,  color:[255,200,0] }
+  /* ── Franja de encabezado ── */
+  doc.setFillColor(30, 41, 59);
+  doc.rect(0, 0, W, 32, 'F');
+
+  /* ── Título ── */
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(18);
+  doc.setFont('helvetica', 'bold');
+  doc.text('Reporte de Tareas de Marketing', 14, 13);
+
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(148, 163, 184);
+  doc.text('Periodo: ' + mes + ' ' + anio, 14, 21);
+  doc.text('Generado: ' + new Date().toLocaleDateString('es-MX', {day:'2-digit',month:'long',year:'numeric'}), 14, 27);
+  doc.text('Total de registros: ' + total, W - 14, 27, { align:'right' });
+
+  /* ── Tarjetas de resumen ── */
+  var cards = [
+    { label:'Total tareas',   val: total,       bg:[241,245,249], num:[30,41,59],   txt:[71,85,105]  },
+    { label:'Completadas',    val: completadas,  bg:[240,253,244], num:[22,163,74],  txt:[21,128,61]  },
+    { label:'Pendientes',     val: pendientes,   bg:[255,251,235], num:[202,138,4],  txt:[161,98,7]   }
   ];
-  var bw = 50, bh = 14, bx = 14;
-  boxes.forEach(function(b){
-    doc.setFillColor(0, 12, 0);
-    doc.setDrawColor(b.color[0], b.color[1], b.color[2]);
-    doc.setLineWidth(0.3);
-    doc.rect(bx, statY, bw, bh, 'FD');
-    doc.setTextColor(b.color[0], b.color[1], b.color[2]);
-    doc.setFontSize(14);
-    doc.setFont('courier','bold');
-    doc.text(String(b.val), bx+bw/2, statY+8, {align:'center'});
-    doc.setFontSize(6);
-    doc.setFont('courier','normal');
-    doc.text(b.label, bx+bw/2, statY+13, {align:'center'});
-    bx += bw + 6;
+  var cw = 55, ch = 18, cx = 14, cy = 38;
+  cards.forEach(function(c){
+    doc.setFillColor(c.bg[0], c.bg[1], c.bg[2]);
+    doc.roundedRect(cx, cy, cw, ch, 2, 2, 'F');
+    doc.setTextColor(c.num[0], c.num[1], c.num[2]);
+    doc.setFontSize(16);
+    doc.setFont('helvetica','bold');
+    doc.text(String(c.val), cx + cw/2, cy + 10, {align:'center'});
+    doc.setTextColor(c.txt[0], c.txt[1], c.txt[2]);
+    doc.setFontSize(7);
+    doc.setFont('helvetica','normal');
+    doc.text(c.label, cx + cw/2, cy + 16, {align:'center'});
+    cx += cw + 5;
   });
 
-  /* ── Tabla con autoTable ── */
+  /* ── Tabla ── */
   var tableRows = rows.map(function(t, i){
     return [
       pad(i+1),
-      t.descripcion || '',
-      t.solicitante || '',
-      t.asignado_a  || '',
-      (t.estado || '').toUpperCase(),
+      t.descripcion  || '',
+      t.solicitante  || '',
+      t.asignado_a   || '',
+      t.estado === 'completada' ? 'Completada' : 'Pendiente',
       t.fecha_creacion   ? fmtDate(t.fecha_creacion)   : '—',
       t.fecha_completada ? fmtDate(t.fecha_completada) : '—'
     ];
   });
 
   doc.autoTable({
-    startY: statY + bh + 6,
-    margin: { left:10, right:10 },
-    head: [['#','TAREA','SOLICITANTE','ASIGNADO','ESTADO','CREACION','COMPLETADA']],
+    startY: cy + ch + 6,
+    margin: { left:14, right:14 },
+    head: [['#','Tarea','Solicitante','Asignado a','Estado','Creación','Completada']],
     body: tableRows,
     styles:{
-      font:'courier',
+      font:'helvetica',
       fontSize:8,
-      cellPadding:3,
-      fillColor:[0,6,0],
-      textColor:[0,180,40],
-      lineColor:[0,60,0],
+      cellPadding:3.5,
+      textColor:[51,65,85],
+      lineColor:[226,232,240],
       lineWidth:0.2
     },
     headStyles:{
-      fillColor:[0,20,0],
-      textColor:[0,255,65],
+      fillColor:[30,41,59],
+      textColor:[255,255,255],
       fontStyle:'bold',
-      fontSize:7,
-      lineColor:[0,180,50],
-      lineWidth:0.3
+      fontSize:8,
+      cellPadding:4
     },
     alternateRowStyles:{
-      fillColor:[0,10,0]
+      fillColor:[248,250,252]
     },
     columnStyles:{
-      0:{ cellWidth:10, halign:'center' },
+      0:{ cellWidth:12, halign:'center', textColor:[148,163,184] },
       1:{ cellWidth:80 },
-      2:{ cellWidth:35 },
+      2:{ cellWidth:36 },
       3:{ cellWidth:30 },
       4:{ cellWidth:28, halign:'center' },
-      5:{ cellWidth:30, halign:'center' },
-      6:{ cellWidth:30, halign:'center' }
+      5:{ cellWidth:32, halign:'center' },
+      6:{ cellWidth:32, halign:'center' }
     },
     didParseCell: function(data){
-      if (data.section==='body' && data.column.index===4){
-        if (data.cell.raw==='COMPLETADA'){
-          data.cell.styles.textColor=[0,255,65];
+      if (data.section === 'body' && data.column.index === 4){
+        if (data.cell.raw === 'Completada'){
+          data.cell.styles.textColor = [22,163,74];
+          data.cell.styles.fontStyle = 'bold';
         } else {
-          data.cell.styles.textColor=[255,200,0];
+          data.cell.styles.textColor = [202,138,4];
+          data.cell.styles.fontStyle = 'bold';
         }
-      }
-      if (data.section==='body' && data.column.index===3){
-        var v = (data.cell.raw||'').toLowerCase();
-        if(v==='alexander') data.cell.styles.textColor=[0,229,255];
-        else if(v==='danner') data.cell.styles.textColor=[255,0,255];
-        else data.cell.styles.textColor=[0,255,65];
       }
     },
     didDrawPage: function(data){
-      /* footer en cada página */
-      doc.setFillColor(0, 4, 0);
-      doc.rect(0, H-10, W, 10, 'F');
-      doc.setDrawColor(0, 100, 30);
-      doc.setLineWidth(0.2);
-      doc.line(6, H-9, W-6, H-9);
+      /* Footer */
+      doc.setDrawColor(226,232,240);
+      doc.setLineWidth(0.3);
+      doc.line(14, H-10, W-14, H-10);
       doc.setFontSize(7);
-      doc.setFont('courier','normal');
-      doc.setTextColor(0,100,30);
-      doc.text('MKT_TASKS // CONFIDENTIAL // THE_MATRIX', W/2, H-3, {align:'center'});
-      doc.text('PAG ' + data.pageNumber, W-10, H-3, {align:'right'});
+      doc.setFont('helvetica','normal');
+      doc.setTextColor(148,163,184);
+      doc.text('Marketing Tasks — Reporte Mensual', 14, H-5);
+      doc.text('Página ' + data.pageNumber, W-14, H-5, {align:'right'});
     }
   });
 
-  doc.save('mkt-tasks-' + mes.toLowerCase() + '-' + anio + '.pdf');
+  doc.save('reporte-tareas-' + mes.toLowerCase() + '-' + anio + '.pdf');
   toast('[ OK ] PDF exportado correctamente', 'ok');
 }
 
