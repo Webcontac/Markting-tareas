@@ -212,12 +212,12 @@ tbody tr:hover{background:rgba(0,255,65,.02)}
 .pf-item:hover .pf-del{opacity:1}
 .pf-del:hover{border-color:var(--red);color:var(--red);background:var(--red-bg)}
 
-/* ══ BOTON EDITAR FECHA (NUEVO) ══ */
+/* ══ BOTON EDITAR FECHA (ORIGINAL) ══ */
 .pf-edit-fecha{width:20px;height:20px;border-radius:2px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--text4);transition:all .15s;flex-shrink:0;opacity:0}
 .pf-item:hover .pf-edit-fecha{opacity:1}
 .pf-edit-fecha:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-bg);box-shadow:0 0 8px rgba(255,224,0,.15)}
 
-/* ══ MODAL EDITAR FECHA (NUEVO) ══ */
+/* ══ MODAL EDITAR FECHA (ORIGINAL) ══ */
 #edit-fecha-overlay{position:fixed;inset:0;z-index:550;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
 #edit-fecha-overlay.open{opacity:1;pointer-events:all}
 #edit-fecha-box{background:var(--bg2);border:1px solid var(--amber);border-radius:var(--r);padding:28px;width:100%;max-width:400px;transform:translateY(16px) scale(.97);transition:transform .25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 50px rgba(255,224,0,.1)}
@@ -256,7 +256,34 @@ tbody tr:hover{background:rgba(0,255,65,.02)}
 .temp-modal-info{font-size:10px;color:var(--text4);margin-bottom:24px;letter-spacing:.5px}
 .temp-modal-footer{display:flex;gap:10px;justify-content:center}
 
-@media(max-width:900px){.pgrid{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}.fg.full{grid-column:1}main{padding:20px 16px}header{padding:0 16px}.pf-grid{grid-template-columns:1fr}.temp-grid{grid-template-columns:1fr}.alex-stats{grid-template-columns:1fr 1fr}}
+/* ══════════════════════════════════════════════════════
+   NUEVOS ESTILOS — EDITAR FECHA CREACIÓN (SEC 01)
+   y EDITAR FECHAS REGISTRO MENSUAL (SEC 06)
+   ══════════════════════════════════════════════════════ */
+
+/* Botón ícono fecha en panels sec 01/02 */
+.tia:hover.fecha{border-color:var(--amber);color:var(--amber);background:var(--amber-bg);box-shadow:0 0 8px rgba(255,224,0,.15)}
+
+/* Botón ícono fecha en tabla sec 06 */
+.tia-fecha-tabla{width:26px;height:26px;border-radius:2px;border:1px solid var(--border2);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text4);transition:all .15s;opacity:1}
+.tia-fecha-tabla:hover{border-color:var(--amber);color:var(--amber);background:var(--amber-bg);box-shadow:0 0 8px rgba(255,224,0,.15)}
+
+/* Modal editar fechas tarea principal */
+#edit-fechas-overlay{position:fixed;inset:0;z-index:560;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+#edit-fechas-overlay.open{opacity:1;pointer-events:all}
+#edit-fechas-box{background:var(--bg2);border:1px solid var(--amber);border-radius:var(--r);padding:28px;width:100%;max-width:460px;transform:translateY(16px) scale(.97);transition:transform .25s cubic-bezier(.34,1.56,.64,1);box-shadow:0 0 50px rgba(255,224,0,.1)}
+#edit-fechas-overlay.open #edit-fechas-box{transform:translateY(0) scale(1)}
+.efm-title{font-family:var(--font-head);font-size:12px;letter-spacing:3px;color:var(--amber);text-shadow:0 0 8px var(--amber);margin-bottom:6px;text-transform:uppercase}
+.efm-desc{font-size:11px;color:var(--text3);margin-bottom:20px;line-height:1.5;letter-spacing:.3px;border-left:2px solid var(--amber);padding-left:10px;padding-top:2px;padding-bottom:2px}
+.efm-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:4px}
+.efm-fg{display:flex;flex-direction:column;gap:6px}
+.efm-fg label{font-size:10px;color:var(--text3);letter-spacing:2px;text-transform:uppercase}
+.efm-hint{font-size:9px;color:var(--text4);letter-spacing:.5px;margin-top:3px}
+.efm-footer{display:flex;align-items:center;justify-content:flex-end;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+.efm-sep{font-size:9px;color:var(--text4);letter-spacing:2px;text-transform:uppercase;margin:14px 0 10px;display:flex;align-items:center;gap:10px}
+.efm-sep::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,var(--border2),transparent)}
+
+@media(max-width:900px){.pgrid{grid-template-columns:1fr}.fgrid{grid-template-columns:1fr}.fg.full{grid-column:1}main{padding:20px 16px}header{padding:0 16px}.pf-grid{grid-template-columns:1fr}.temp-grid{grid-template-columns:1fr}.alex-stats{grid-template-columns:1fr 1fr}.efm-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.agrid{grid-template-columns:1fr}.hm{gap:8px}.btn-diarias-header{font-size:8px;padding:4px 10px}}
 </style>
 </head>
@@ -510,7 +537,7 @@ tbody tr:hover{background:rgba(0,255,65,.02)}
   </div>
 </div>
 
-<!-- ══ MODAL EDITAR FECHA (NUEVO) ══ -->
+<!-- ══ MODAL EDITAR FECHA LÍMITE (ORIGINAL sec 04) ══ -->
 <div id="edit-fecha-overlay">
   <div id="edit-fecha-box">
     <div class="ef-title">// MODIFICAR_FECHA_LIMITE</div>
@@ -521,6 +548,33 @@ tbody tr:hover{background:rgba(0,255,65,.02)}
     <div class="ef-footer">
       <button class="mbtn cancel" onclick="closeEditFechaModal()">CANCELAR</button>
       <button class="mbtn save" id="ef-btn-save" onclick="saveEditFecha()" style="color:var(--amber);border-color:var(--amber);font-family:var(--font-head);font-size:10px;letter-spacing:2px">GUARDAR_FECHA</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════
+     NUEVO MODAL — EDITAR FECHAS TAREA PRINCIPAL
+     (sec 01 desde panels + sec 06 registro mensual)
+     ══════════════════════════════════════════════════════ -->
+<div id="edit-fechas-overlay">
+  <div id="edit-fechas-box">
+    <div class="efm-title">// MODIFICAR_FECHAS_TAREA</div>
+    <div class="efm-desc" id="efm-desc-text">[ descripcion de la tarea ]</div>
+    <div class="efm-grid">
+      <div class="efm-fg">
+        <label>// fecha de creacion</label>
+        <input type="datetime-local" id="efm-fecha-creacion">
+        <div class="efm-hint" id="efm-hint-creacion"></div>
+      </div>
+      <div class="efm-fg" id="efm-fg-completada">
+        <label>// fecha completada</label>
+        <input type="datetime-local" id="efm-fecha-completada">
+        <div class="efm-hint" id="efm-hint-completada"></div>
+      </div>
+    </div>
+    <div class="efm-footer">
+      <button class="mbtn cancel" onclick="closeEditFechasModal()">CANCELAR</button>
+      <button class="mbtn save" id="efm-btn-save" onclick="saveEditFechas()" style="color:var(--amber);border-color:var(--amber);font-family:var(--font-head);font-size:10px;letter-spacing:2px">GUARDAR_FECHAS</button>
     </div>
   </div>
 </div>
@@ -686,8 +740,11 @@ function renderPanels(){
       html+='<div class="'+cls+'"><div class="cc" onclick="toggle(&quot;'+sid+'&quot;,&quot;'+sest+'&quot;)">'+chk+'</div>'
         +'<div class="tc" onclick="toggle(&quot;'+sid+'&quot;,&quot;'+sest+'&quot;)"><div class="tdesc">'+esc(t.descripcion)+'</div>'
         +'<div class="tmeta">> '+esc(t.solicitante)+' | '+esc(t.mes)+' '+esc(String(t.año))+'</div></div>'
-        +'<div class="ti-actions"><button class="tia edit" onclick="openEditModal(&quot;'+sid+'&quot;)">✏</button>'
-        +'<button class="tia del" onclick="confirmDelete(&quot;'+sid+'&quot;)">✕</button></div></div>';
+        +'<div class="ti-actions">'
+        +'<button class="tia fecha" title="Editar fechas" onclick="openEditFechasModal(&quot;'+sid+'&quot;)">&#128197;</button>'
+        +'<button class="tia edit" onclick="openEditModal(&quot;'+sid+'&quot;)">✏</button>'
+        +'<button class="tia del" onclick="confirmDelete(&quot;'+sid+'&quot;)">✕</button>'
+        +'</div></div>';
     });
     el.innerHTML=html;
   });
@@ -724,6 +781,7 @@ function renderTable(){
       +'<td style="font-size:11px;color:var(--text4)">'+fc+'</td>'
       +'<td style="font-size:11px;color:var(--text4)">'+fcp+'</td>'
       +'<td><div style="display:flex;gap:6px">'
+      +'<button class="tia-fecha-tabla" title="Editar fechas" onclick="openEditFechasModal(&quot;'+sid+'&quot;)">&#128197;</button>'
       +'<button class="tia edit" style="opacity:1;width:26px;height:26px" onclick="openEditModal(&quot;'+sid+'&quot;)">✏</button>'
       +'<button class="tia del" style="opacity:1;width:26px;height:26px" onclick="confirmDelete(&quot;'+sid+'&quot;)">✕</button>'
       +'</div></td></tr>';
@@ -1218,11 +1276,7 @@ document.getElementById('confirm-overlay').addEventListener('click',function(e){
 document.getElementById('diarias-overlay').addEventListener('click',function(e){if(e.target===this)closeDiarias();});
 document.getElementById('temp-modal-overlay').addEventListener('click',function(e){if(e.target===this)closeTempModal();});
 
-/* ═══════════════════════════════════════════════
-   NUEVA FUNCIONALIDAD: EDITAR FECHA LÍMITE
-   (código agregado sin modificar nada del original)
-   ═══════════════════════════════════════════════ */
-
+/* ═══ MODAL EDITAR FECHA LÍMITE (ORIGINAL sec 04) ═══ */
 var editFechaId = null;
 
 function openEditFechaModal(id) {
@@ -1279,6 +1333,135 @@ function saveEditFecha() {
 
 document.getElementById('edit-fecha-overlay').addEventListener('click', function(e){
   if (e.target === this) closeEditFechaModal();
+});
+
+/* ═══════════════════════════════════════════════════════════════════
+   NUEVA FUNCIONALIDAD: EDITAR FECHAS DE CREACIÓN Y COMPLETADA
+   para tareas principales — accesible desde Sec 01 (panels) y Sec 06 (tabla)
+   ═══════════════════════════════════════════════════════════════════ */
+
+var editFechasTaskId = null;
+
+/**
+ * Convierte un ISO string a valor compatible con datetime-local input
+ * e.g. "2024-06-15T14:30:00Z" → "2024-06-15T14:30"
+ */
+function isoToDatetimeLocal(isoStr) {
+  if (!isoStr) return '';
+  try {
+    var d = new Date(isoStr);
+    if (isNaN(d.getTime())) return '';
+    var year  = d.getFullYear();
+    var month = String(d.getMonth() + 1).padStart(2, '0');
+    var day   = String(d.getDate()).padStart(2, '0');
+    var hours = String(d.getHours()).padStart(2, '0');
+    var mins  = String(d.getMinutes()).padStart(2, '0');
+    return year + '-' + month + '-' + day + 'T' + hours + ':' + mins;
+  } catch(e) { return ''; }
+}
+
+/**
+ * Abre el modal de edición de fechas para una tarea principal (id de tareas).
+ * Se llama desde renderPanels (sec 01/02) y desde renderTable (sec 06).
+ */
+function openEditFechasModal(id) {
+  var t = tasks.find(function(x){ return String(x.id) === String(id); });
+  if (!t) { toast('[ ERR ] registro no encontrado', 'err'); return; }
+
+  editFechasTaskId = id;
+
+  // Descripción de contexto
+  document.getElementById('efm-desc-text').textContent = t.descripcion || '';
+
+  // Fecha de creación
+  var valCreacion = isoToDatetimeLocal(t.fecha_creacion);
+  document.getElementById('efm-fecha-creacion').value = valCreacion;
+  document.getElementById('efm-hint-creacion').textContent =
+    t.fecha_creacion ? '> actual: ' + fmtDate(t.fecha_creacion) : '> sin fecha registrada';
+
+  // Fecha completada — solo visible si la tarea tiene fecha_completada
+  var fgComp = document.getElementById('efm-fg-completada');
+  var valComp = isoToDatetimeLocal(t.fecha_completada);
+  document.getElementById('efm-fecha-completada').value = valComp;
+  document.getElementById('efm-hint-completada').textContent =
+    t.fecha_completada ? '> actual: ' + fmtDate(t.fecha_completada) : '> dejar vacío si no aplica';
+
+  // Mostrar/ocultar campo completada con estilo sutil
+  fgComp.style.opacity = t.fecha_completada ? '1' : '0.5';
+
+  document.getElementById('edit-fechas-overlay').classList.add('open');
+}
+
+function closeEditFechasModal() {
+  document.getElementById('edit-fechas-overlay').classList.remove('open');
+  editFechasTaskId = null;
+}
+
+function saveEditFechas() {
+  if (!editFechasTaskId) { toast('[ ERROR ] tarea no identificada', 'err'); return; }
+
+  var rawCreacion   = (document.getElementById('efm-fecha-creacion').value || '').trim();
+  var rawCompletada = (document.getElementById('efm-fecha-completada').value || '').trim();
+
+  if (!rawCreacion) { toast('[ ERROR ] la fecha de creacion es obligatoria', 'err'); return; }
+
+  // Convertir a ISO para guardar
+  var isoCreacion   = rawCreacion   ? new Date(rawCreacion).toISOString()   : null;
+  var isoCompletada = rawCompletada ? new Date(rawCompletada).toISOString() : null;
+
+  // Detectar mes/año nuevos a partir de la nueva fecha de creación para actualizar el registro
+  var dCreacion = new Date(rawCreacion);
+  var nuevoMes  = MESES[dCreacion.getMonth()];
+  var nuevoAnio = dCreacion.getFullYear();
+
+  var payload = {
+    fecha_creacion: isoCreacion,
+    mes: nuevoMes,
+    año: nuevoAnio
+  };
+  // Solo incluir fecha_completada en el payload si el usuario ingresó un valor
+  // o si la tarea ya tenía una y queremos permitir borrarla (campo vacío = null)
+  payload.fecha_completada = isoCompletada;
+
+  var btn = document.getElementById('efm-btn-save');
+  if (btn) { btn.disabled = true; btn.textContent = 'PROCESANDO...'; }
+
+  fetch(API + '?id=eq.' + editFechasTaskId, {
+    method: 'PATCH',
+    headers: Object.assign({}, H, { 'Prefer': 'return=representation' }),
+    body: JSON.stringify(payload)
+  })
+  .then(function(r) {
+    if (!r.ok) return r.text().then(function(t){ throw new Error(t || 'HTTP ' + r.status); });
+    return r.json();
+  })
+  .then(function(data) {
+    var updated = Array.isArray(data) ? data[0] : data;
+    var i = tasks.findIndex(function(x){ return String(x.id) === String(editFechasTaskId); });
+    if (i > -1) {
+      if (updated && updated.id) {
+        tasks[i] = updated;
+      } else {
+        tasks[i].fecha_creacion   = isoCreacion;
+        tasks[i].fecha_completada = isoCompletada;
+        tasks[i].mes  = nuevoMes;
+        tasks[i].año  = nuevoAnio;
+      }
+    }
+    render();
+    closeEditFechasModal();
+    toast('[ OK ] fechas actualizadas correctamente', 'ok');
+  })
+  .catch(function(e) { toast('[ FAIL ] ' + e.message, 'err'); })
+  .finally(function() {
+    var b = document.getElementById('efm-btn-save');
+    if (b) { b.disabled = false; b.textContent = 'GUARDAR_FECHAS'; }
+  });
+}
+
+// Cerrar al click fuera del box
+document.getElementById('edit-fechas-overlay').addEventListener('click', function(e){
+  if (e.target === this) closeEditFechasModal();
 });
 </script>
 </body>
