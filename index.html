@@ -497,7 +497,7 @@ tbody tr:hover{background:rgba(0,255,65,.02)}
         <table>
           <thead><tr>
             <th>#</th><th>TAREA</th><th>SOLICITANTE</th>
-            <th>ASIGNADO</th><th>ESTADO</th><th>CREACION</th><th>COMPLETADA</th><th>OPS</th>
+            <th>ASIGNADO</th><th>ESTADO</th><th>REALIZACIÓN</th><th>OPS</th>
           </tr></thead>
           <tbody id="tbody"></tbody>
         </table>
@@ -610,23 +610,17 @@ tbody tr:hover{background:rgba(0,255,65,.02)}
      ══════════════════════════════════════════════════════ -->
 <div id="edit-fechas-overlay">
   <div id="edit-fechas-box">
-    <div class="efm-title">// MODIFICAR_FECHAS_TAREA</div>
+    <div class="efm-title">// MODIFICAR_FECHA_REALIZACION</div>
     <div class="efm-desc" id="efm-desc-text">[ descripcion de la tarea ]</div>
-    <div class="efm-grid">
-      <div class="efm-fg">
-        <label>// fecha de creacion</label>
-        <input type="datetime-local" id="efm-fecha-creacion">
-        <div class="efm-hint" id="efm-hint-creacion"></div>
-      </div>
-      <div class="efm-fg" id="efm-fg-completada">
-        <label>// fecha completada</label>
-        <input type="datetime-local" id="efm-fecha-completada">
-        <div class="efm-hint" id="efm-hint-completada"></div>
-      </div>
+    <div class="efm-fg" id="efm-fg-completada">
+      <label>// fecha de realización</label>
+      <input type="datetime-local" id="efm-fecha-completada">
+      <div class="efm-hint" id="efm-hint-completada"></div>
+      <div class="efm-hint">> deja vacío si la tarea sigue pendiente (sin realizar)</div>
     </div>
     <div class="efm-footer">
       <button class="mbtn cancel" onclick="closeEditFechasModal()">CANCELAR</button>
-      <button class="mbtn save" id="efm-btn-save" onclick="saveEditFechas()" style="color:var(--amber);border-color:var(--amber);font-family:var(--font-head);font-size:10px;letter-spacing:2px">GUARDAR_FECHAS</button>
+      <button class="mbtn save" id="efm-btn-save" onclick="saveEditFechas()" style="color:var(--amber);border-color:var(--amber);font-family:var(--font-head);font-size:10px;letter-spacing:2px">GUARDAR_FECHA</button>
     </div>
   </div>
 </div>
@@ -861,7 +855,7 @@ function renderPanels(){
         +'<div class="tc" onclick="toggle(&quot;'+sid+'&quot;,&quot;'+sest+'&quot;)"><div class="tdesc">'+esc(t.descripcion)+'</div>'
         +'<div class="tmeta">> '+esc(t.solicitante)+' | '+esc(t.mes)+' '+esc(String(t.año))+'</div></div>'
         +'<div class="ti-actions">'
-        +'<button class="tia fecha" title="Editar fechas" onclick="openEditFechasModal(&quot;'+sid+'&quot;)">&#128197;</button>'
+        +'<button class="tia fecha" title="Editar fecha de realización" onclick="openEditFechasModal(&quot;'+sid+'&quot;)">&#128197;</button>'
         +'<button class="tia edit" onclick="openEditModal(&quot;'+sid+'&quot;)">✏</button>'
         +'<button class="tia del" onclick="confirmDelete(&quot;'+sid+'&quot;)">✕</button>'
         +'</div></div>';
@@ -882,13 +876,12 @@ function renderTabs(){
 
 function renderTable(){
   var el=document.getElementById('tbody');if(!el)return;
-  if(!selMonth){el.innerHTML='<tr><td colspan="8"><div class="nodata">[ selecciona_periodo ]</div></td></tr>';return;}
+  if(!selMonth){el.innerHTML='<tr><td colspan="7"><div class="nodata">[ selecciona_periodo ]</div></td></tr>';return;}
   var parts=selMonth.split(' ');var mes=parts[0],anio=parseInt(parts[1],10);
   var rows=tasks.filter(function(t){return t.mes===mes&&t.año===anio;});
-  if(!rows.length){el.innerHTML='<tr><td colspan="8"><div class="nodata">[ 0 registros encontrados ]</div></td></tr>';return;}
+  if(!rows.length){el.innerHTML='<tr><td colspan="7"><div class="nodata">[ 0 registros encontrados ]</div></td></tr>';return;}
   var html='';
   rows.forEach(function(t,i){
-    var fc=t.fecha_creacion?fmtDate(t.fecha_creacion):'—';
     var fcp=t.fecha_completada?fmtDate(t.fecha_completada):'—';
     var uk=t.asignado_a?t.asignado_a.toLowerCase():'';
     var est=t.estado==='completada'?'&#10003; COMPLETADA':'&#9675; PENDIENTE';
@@ -898,10 +891,9 @@ function renderTable(){
       +'<td>'+esc(t.solicitante)+'</td>'
       +'<td><span class="badge '+uk+'">'+esc(t.asignado_a)+'</span></td>'
       +'<td><span class="badge '+esc(t.estado)+'">'+est+'</span></td>'
-      +'<td style="font-size:11px;color:var(--text4)">'+fc+'</td>'
       +'<td style="font-size:11px;color:var(--text4)">'+fcp+'</td>'
       +'<td><div style="display:flex;gap:6px">'
-      +'<button class="tia-fecha-tabla" title="Editar fechas" onclick="openEditFechasModal(&quot;'+sid+'&quot;)">&#128197;</button>'
+      +'<button class="tia-fecha-tabla" title="Editar fecha de realización" onclick="openEditFechasModal(&quot;'+sid+'&quot;)">&#128197;</button>'
       +'<button class="tia edit" style="opacity:1;width:26px;height:26px" onclick="openEditModal(&quot;'+sid+'&quot;)">✏</button>'
       +'<button class="tia del" style="opacity:1;width:26px;height:26px" onclick="confirmDelete(&quot;'+sid+'&quot;)">✕</button>'
       +'</div></td></tr>';
@@ -1316,8 +1308,8 @@ function download(){
   doc.text('Generado: '+new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'}),W-14,23,{align:'right'});
   doc.setFontSize(9);doc.setTextColor(50,50,50);
   doc.text('Total: '+total+'   |   Completadas: '+completadas+'   |   Pendientes: '+pendientes,14,30);
-  var tableRows=rows.map(function(t,i){return[pad(i+1),t.descripcion||'',t.solicitante||'',t.asignado_a||'',t.estado==='completada'?'Completada':'Pendiente',t.fecha_creacion?fmtDate(t.fecha_creacion):'-',t.fecha_completada?fmtDate(t.fecha_completada):'-'];});
-  doc.autoTable({startY:35,margin:{left:14,right:14},head:[['#','Tarea','Solicitante','Asignado a','Estado','Creación','Completada']],body:tableRows,styles:{font:'helvetica',fontSize:8,cellPadding:3,textColor:[30,30,30],fillColor:[255,255,255],lineColor:[200,200,200],lineWidth:0.2},headStyles:{fillColor:[255,255,255],textColor:[30,30,30],fontStyle:'bold',fontSize:8,lineColor:[150,150,150],lineWidth:0.3},alternateRowStyles:{fillColor:[245,245,245]},columnStyles:{0:{cellWidth:10,halign:'center',textColor:[120,120,120]},1:{cellWidth:82},2:{cellWidth:36},3:{cellWidth:30},4:{cellWidth:28,halign:'center'},5:{cellWidth:32,halign:'center'},6:{cellWidth:32,halign:'center'}},didParseCell:function(data){if(data.section==='body'&&data.column.index===4){if(data.cell.raw==='Completada')data.cell.styles.textColor=[34,139,34];else data.cell.styles.textColor=[180,100,0];}},didDrawPage:function(data){doc.setDrawColor(180,180,180);doc.setLineWidth(0.3);doc.line(14,H2-10,W-14,H2-10);doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(130,130,130);doc.text('Marketing Tasks — Reporte Mensual',14,H2-5);doc.text('Página '+data.pageNumber,W-14,H2-5,{align:'right'});}});
+  var tableRows=rows.map(function(t,i){return[pad(i+1),t.descripcion||'',t.solicitante||'',t.asignado_a||'',t.estado==='completada'?'Completada':'Pendiente',t.fecha_completada?fmtDate(t.fecha_completada):'-'];});
+  doc.autoTable({startY:35,margin:{left:14,right:14},head:[['#','Tarea','Solicitante','Asignado a','Estado','Realización']],body:tableRows,styles:{font:'helvetica',fontSize:8,cellPadding:3,textColor:[30,30,30],fillColor:[255,255,255],lineColor:[200,200,200],lineWidth:0.2},headStyles:{fillColor:[255,255,255],textColor:[30,30,30],fontStyle:'bold',fontSize:8,lineColor:[150,150,150],lineWidth:0.3},alternateRowStyles:{fillColor:[245,245,245]},columnStyles:{0:{cellWidth:10,halign:'center',textColor:[120,120,120]},1:{cellWidth:96},2:{cellWidth:40},3:{cellWidth:34},4:{cellWidth:32,halign:'center'},5:{cellWidth:36,halign:'center'}},didParseCell:function(data){if(data.section==='body'&&data.column.index===4){if(data.cell.raw==='Completada')data.cell.styles.textColor=[34,139,34];else data.cell.styles.textColor=[180,100,0];}},didDrawPage:function(data){doc.setDrawColor(180,180,180);doc.setLineWidth(0.3);doc.line(14,H2-10,W-14,H2-10);doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(130,130,130);doc.text('Marketing Tasks — Reporte Mensual',14,H2-5);doc.text('Página '+data.pageNumber,W-14,H2-5,{align:'right'});}});
   doc.save('reporte-tareas-'+mes.toLowerCase()+'-'+anio+'.pdf');
   toast('[ OK ] PDF exportado correctamente','ok');
 }
@@ -1493,21 +1485,11 @@ function openEditFechasModal(id) {
   // Descripción de contexto
   document.getElementById('efm-desc-text').textContent = t.descripcion || '';
 
-  // Fecha de creación
-  var valCreacion = isoToDatetimeLocal(t.fecha_creacion);
-  document.getElementById('efm-fecha-creacion').value = valCreacion;
-  document.getElementById('efm-hint-creacion').textContent =
-    t.fecha_creacion ? '> actual: ' + fmtDate(t.fecha_creacion) : '> sin fecha registrada';
-
-  // Fecha completada — solo visible si la tarea tiene fecha_completada
-  var fgComp = document.getElementById('efm-fg-completada');
+  // Fecha de realización (fecha_completada)
   var valComp = isoToDatetimeLocal(t.fecha_completada);
   document.getElementById('efm-fecha-completada').value = valComp;
   document.getElementById('efm-hint-completada').textContent =
-    t.fecha_completada ? '> actual: ' + fmtDate(t.fecha_completada) : '> dejar vacío si no aplica';
-
-  // Mostrar/ocultar campo completada con estilo sutil
-  fgComp.style.opacity = t.fecha_completada ? '1' : '0.5';
+    t.fecha_completada ? '> actual: ' + fmtDate(t.fecha_completada) : '> aún no se ha marcado como realizada';
 
   document.getElementById('edit-fechas-overlay').classList.add('open');
 }
@@ -1520,28 +1502,17 @@ function closeEditFechasModal() {
 function saveEditFechas() {
   if (!editFechasTaskId) { toast('[ ERROR ] tarea no identificada', 'err'); return; }
 
-  var rawCreacion   = (document.getElementById('efm-fecha-creacion').value || '').trim();
   var rawCompletada = (document.getElementById('efm-fecha-completada').value || '').trim();
-
-  if (!rawCreacion) { toast('[ ERROR ] la fecha de creacion es obligatoria', 'err'); return; }
-
-  // Convertir a ISO para guardar
-  var isoCreacion   = rawCreacion   ? new Date(rawCreacion).toISOString()   : null;
   var isoCompletada = rawCompletada ? new Date(rawCompletada).toISOString() : null;
 
-  // Detectar mes/año nuevos a partir de la nueva fecha de creación para actualizar el registro
-  var dCreacion = new Date(rawCreacion);
-  var nuevoMes  = MESES[dCreacion.getMonth()];
-  var nuevoAnio = dCreacion.getFullYear();
+  // El mes/año de la tarea NO se toca aquí: se define al crearla (modo rápido) y se
+  // mantiene fijo aunque cambies la fecha de realización, para que no "brinque" de mes.
+  var nuevoEstado = isoCompletada ? 'completada' : 'pendiente';
 
   var payload = {
-    fecha_creacion: isoCreacion,
-    mes: nuevoMes,
-    año: nuevoAnio
+    fecha_completada: isoCompletada,
+    estado: nuevoEstado
   };
-  // Solo incluir fecha_completada en el payload si el usuario ingresó un valor
-  // o si la tarea ya tenía una y queremos permitir borrarla (campo vacío = null)
-  payload.fecha_completada = isoCompletada;
 
   var btn = document.getElementById('efm-btn-save');
   if (btn) { btn.disabled = true; btn.textContent = 'PROCESANDO...'; }
@@ -1562,20 +1533,18 @@ function saveEditFechas() {
       if (updated && updated.id) {
         tasks[i] = updated;
       } else {
-        tasks[i].fecha_creacion   = isoCreacion;
         tasks[i].fecha_completada = isoCompletada;
-        tasks[i].mes  = nuevoMes;
-        tasks[i].año  = nuevoAnio;
+        tasks[i].estado = nuevoEstado;
       }
     }
     render();
     closeEditFechasModal();
-    toast('[ OK ] fechas actualizadas correctamente', 'ok');
+    toast('[ OK ] fecha de realización actualizada','ok');
   })
   .catch(function(e) { toast('[ FAIL ] ' + e.message, 'err'); })
   .finally(function() {
     var b = document.getElementById('efm-btn-save');
-    if (b) { b.disabled = false; b.textContent = 'GUARDAR_FECHAS'; }
+    if (b) { b.disabled = false; b.textContent = 'GUARDAR_FECHA'; }
   });
 }
 
