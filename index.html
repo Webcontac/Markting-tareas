@@ -1299,6 +1299,9 @@ function download(){
   var doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
   var W=doc.internal.pageSize.getWidth(),H2=doc.internal.pageSize.getHeight();
   var total=rows.length,completadas=rows.filter(function(t){return t.estado==='completada';}).length,pendientes=rows.filter(function(t){return t.estado==='pendiente';}).length;
+  var totalAlex=rows.filter(function(t){return t.asignado_a==='Alexander';}).length;
+  var totalDanner=rows.filter(function(t){return t.asignado_a==='Danner';}).length;
+  var totalAmbos=rows.filter(function(t){return t.asignado_a==='Ambos';}).length;
   doc.setFillColor(255,255,255);doc.rect(0,0,W,H2,'F');
   doc.setTextColor(30,30,30);doc.setFontSize(16);doc.setFont('helvetica','bold');
   doc.text('Reporte de Tareas de Marketing',14,14);
@@ -1308,8 +1311,10 @@ function download(){
   doc.text('Generado: '+new Date().toLocaleDateString('es-MX',{day:'2-digit',month:'long',year:'numeric'}),W-14,23,{align:'right'});
   doc.setFontSize(9);doc.setTextColor(50,50,50);
   doc.text('Total: '+total+'   |   Completadas: '+completadas+'   |   Pendientes: '+pendientes,14,30);
+  doc.setFontSize(9);doc.setTextColor(50,50,50);
+  doc.text('Por agente  —  Alexander: '+totalAlex+'   |   Danner: '+totalDanner+'   |   Ambos: '+totalAmbos,14,36);
   var tableRows=rows.map(function(t,i){return[pad(i+1),t.descripcion||'',t.solicitante||'',t.asignado_a||'',t.estado==='completada'?'Completada':'Pendiente',t.fecha_completada?fmtDate(t.fecha_completada):'-'];});
-  doc.autoTable({startY:35,margin:{left:14,right:14},head:[['#','Tarea','Solicitante','Asignado a','Estado','Realización']],body:tableRows,styles:{font:'helvetica',fontSize:8,cellPadding:3,textColor:[30,30,30],fillColor:[255,255,255],lineColor:[200,200,200],lineWidth:0.2},headStyles:{fillColor:[255,255,255],textColor:[30,30,30],fontStyle:'bold',fontSize:8,lineColor:[150,150,150],lineWidth:0.3},alternateRowStyles:{fillColor:[245,245,245]},columnStyles:{0:{cellWidth:10,halign:'center',textColor:[120,120,120]},1:{cellWidth:96},2:{cellWidth:40},3:{cellWidth:34},4:{cellWidth:32,halign:'center'},5:{cellWidth:36,halign:'center'}},didParseCell:function(data){if(data.section==='body'&&data.column.index===4){if(data.cell.raw==='Completada')data.cell.styles.textColor=[34,139,34];else data.cell.styles.textColor=[180,100,0];}},didDrawPage:function(data){doc.setDrawColor(180,180,180);doc.setLineWidth(0.3);doc.line(14,H2-10,W-14,H2-10);doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(130,130,130);doc.text('Marketing Tasks — Reporte Mensual',14,H2-5);doc.text('Página '+data.pageNumber,W-14,H2-5,{align:'right'});}});
+  doc.autoTable({startY:41,margin:{left:14,right:14},head:[['#','Tarea','Solicitante','Asignado a','Estado','Realización']],body:tableRows,styles:{font:'helvetica',fontSize:8,cellPadding:3,textColor:[30,30,30],fillColor:[255,255,255],lineColor:[200,200,200],lineWidth:0.2},headStyles:{fillColor:[255,255,255],textColor:[30,30,30],fontStyle:'bold',fontSize:8,lineColor:[150,150,150],lineWidth:0.3},alternateRowStyles:{fillColor:[245,245,245]},columnStyles:{0:{cellWidth:10,halign:'center',textColor:[120,120,120]},1:{cellWidth:96},2:{cellWidth:40},3:{cellWidth:34},4:{cellWidth:32,halign:'center'},5:{cellWidth:36,halign:'center'}},didParseCell:function(data){if(data.section==='body'&&data.column.index===4){if(data.cell.raw==='Completada')data.cell.styles.textColor=[34,139,34];else data.cell.styles.textColor=[180,100,0];}},didDrawPage:function(data){doc.setDrawColor(180,180,180);doc.setLineWidth(0.3);doc.line(14,H2-10,W-14,H2-10);doc.setFontSize(7);doc.setFont('helvetica','normal');doc.setTextColor(130,130,130);doc.text('Marketing Tasks — Reporte Mensual',14,H2-5);doc.text('Página '+data.pageNumber,W-14,H2-5,{align:'right'});}});
   doc.save('reporte-tareas-'+mes.toLowerCase()+'-'+anio+'.pdf');
   toast('[ OK ] PDF exportado correctamente','ok');
 }
