@@ -331,7 +331,7 @@ tbody tr:hover{background:rgba(0,255,65,.02)}
     <div class="card">
 
       <div class="qm-bar">
-        <div class="qm-info">&#9889; <b>MODO RÁPIDO:</b> al activarlo, el solicitante, el agente asignado, el mes/año y la fecha de realización quedan FIJOS después de agregar una tarea, para seguir agregando sin volver a seleccionar.</div>
+        <div class="qm-info">&#9889; <b>MODO RÁPIDO:</b> al activarlo, el solicitante, el agente asignado, la fecha de la tarea (día/mes/año) y la fecha de realización quedan FIJOS después de agregar una tarea, para seguir agregando sin volver a seleccionar.</div>
         <div class="qm-toggle" id="qm-toggle" onclick="toggleModoRapido()"><span class="qm-dot"></span><span id="qm-toggle-txt">MODO RÁPIDO: OFF</span></div>
       </div>
 
@@ -367,11 +367,8 @@ tbody tr:hover{background:rgba(0,255,65,.02)}
           </div>
         </div>
         <div class="fg">
-          <label>// mes / año de la tarea</label>
-          <div class="mesgrid">
-            <select id="inp-mes"></select>
-            <input type="number" id="inp-anio" placeholder="2026">
-          </div>
+          <label>// fecha de la tarea (día / mes / año)</label>
+          <input type="date" id="inp-fecha-tarea">
         </div>
         <div class="fg">
           <label>// realización (opcional)</label>
@@ -674,7 +671,7 @@ var modoRapido=false;
 window.onload=function(){
   var el=document.getElementById('currentDate');
   if(el){ var n=new Date(); el.textContent=n.toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
-  poblarSelectMes();
+  resetFechaTarea();
   getTasks();
   getAlexTasks();
   getPendFecha();
@@ -724,16 +721,13 @@ function pad(n){return n<10?'0'+n:String(n);}
 function toDate(label){var p=label.split(' ');return new Date(p[1]+'-'+String(MESES.indexOf(p[0])+1).padStart(2,'0')+'-01');}
 
 /* ═══ MODO RÁPIDO / SELECCIÓN FIJA (SEC 01) ═══ */
-function poblarSelectMes(){
-  var sel=document.getElementById('inp-mes');
-  if(!sel)return;
-  var html='';
-  MESES.forEach(function(m,i){html+='<option value="'+i+'">'+m+'</option>';});
-  sel.innerHTML=html;
-  var n=new Date();
-  sel.value=n.getMonth();
-  var anioEl=document.getElementById('inp-anio');
-  if(anioEl) anioEl.value=n.getFullYear();
+/* Fija (o resetea) el campo de fecha de la tarea (día/mes/año) a HOY.
+   Se usa al cargar la página y, cuando el Modo Rápido está OFF, después
+   de agregar cada tarea. Con Modo Rápido ON este campo NO se toca, para
+   que el día que el usuario eligió se mantenga fijo hasta que él lo cambie. */
+function resetFechaTarea(){
+  var el=document.getElementById('inp-fecha-tarea');
+  if(el) el.value=todayStr();
 }
 
 function toggleModoRapido(){
@@ -787,14 +781,17 @@ function getTasks(){
 function addTask(){
   var sol=getSolicitanteActual();
   var desc=(document.getElementById('inp-desc').value||'').trim();
-  var mesIdx=parseInt(document.getElementById('inp-mes').value,10);
-  var anio=parseInt(document.getElementById('inp-anio').value,10);
+  var fechaTareaStr=(document.getElementById('inp-fecha-tarea').value||'').trim();
   var yaRealizada=document.getElementById('inp-ya-realizada').checked;
   var fechaRealizada=(document.getElementById('inp-fecha-realizada').value||'').trim();
   if(!sol){toast('[ ERROR ] ingresa el solicitante','err');return;}
   if(!desc){toast('[ ERROR ] ingresa la descripcion','err');return;}
   if(!selUser){toast('[ ERROR ] selecciona el agente destino','err');return;}
-  if(isNaN(mesIdx)||isNaN(anio)||!anio){toast('[ ERROR ] selecciona el mes y año','err');return;}
+  if(!fechaTareaStr){toast('[ ERROR ] selecciona la fecha de la tarea','err');return;}
+  var fechaTareaObj=new Date(fechaTareaStr+'T12:00:00');
+  if(isNaN(fechaTareaObj.getTime())){toast('[ ERROR ] fecha de la tarea inválida','err');return;}
+  var mesIdx=fechaTareaObj.getMonth();
+  var anio=fechaTareaObj.getFullYear();
   var btn=document.getElementById('btn-add');
   if(btn){btn.disabled=true;btn.textContent='> PROCESANDO...';}
   var estado=yaRealizada?'completada':'pendiente';
@@ -811,7 +808,7 @@ function addTask(){
         document.getElementById('inp-sol-select').value='';
         document.getElementById('inp-sol').value='';
         document.getElementById('inp-sol').classList.remove('show');
-        poblarSelectMes();
+        resetFechaTarea();
         document.getElementById('inp-ya-realizada').checked=false;
         document.getElementById('inp-fecha-realizada').classList.remove('show');
         document.getElementById('inp-fecha-realizada').value='';
