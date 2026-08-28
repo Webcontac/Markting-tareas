@@ -331,7 +331,7 @@ tbody tr:hover{background:rgba(0,255,65,.02)}
     <div class="card">
 
       <div class="qm-bar">
-        <div class="qm-info">&#9889; <b>MODO RÁPIDO:</b> al activarlo, el solicitante, el agente asignado y el mes/año quedan FIJOS después de agregar una tarea, para seguir agregando sin volver a seleccionar.</div>
+        <div class="qm-info">&#9889; <b>MODO RÁPIDO:</b> al activarlo, el solicitante, el agente asignado, el mes/año y la fecha de realización quedan FIJOS después de agregar una tarea, para seguir agregando sin volver a seleccionar.</div>
         <div class="qm-toggle" id="qm-toggle" onclick="toggleModoRapido()"><span class="qm-dot"></span><span id="qm-toggle-txt">MODO RÁPIDO: OFF</span></div>
       </div>
 
@@ -806,15 +806,15 @@ function addTask(){
       var row=Array.isArray(data)?data[0]:data;
       if(row&&row.id){tasks.unshift(row);render();}
       document.getElementById('inp-desc').value='';
-      document.getElementById('inp-ya-realizada').checked=false;
-      document.getElementById('inp-fecha-realizada').classList.remove('show');
-      document.getElementById('inp-fecha-realizada').value='';
       if(!modoRapido){
         clearUser();
         document.getElementById('inp-sol-select').value='';
         document.getElementById('inp-sol').value='';
         document.getElementById('inp-sol').classList.remove('show');
         poblarSelectMes();
+        document.getElementById('inp-ya-realizada').checked=false;
+        document.getElementById('inp-fecha-realizada').classList.remove('show');
+        document.getElementById('inp-fecha-realizada').value='';
       }
       toast('[ OK ] tarea inyectada en el sistema'+(modoRapido?' — selección fija activa':''),'ok');
     })
